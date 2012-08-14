@@ -24,6 +24,7 @@ private slots:
 	void ControlButton_Click();
 	void TasklistView_Click(int);
 	void Wakefile_Scan();
+	void Alarm_Slot();
 signals:
 
 private:
@@ -35,7 +36,9 @@ private:
 	QLabel *nowTask;
 	void loadFile();
 	void saveFile();
-	int chosen;
+	void startRest();
+	void endRest();
+	int chosen,rested;
 protected:
 	void closeEvent(QCloseEvent *event);
 public:

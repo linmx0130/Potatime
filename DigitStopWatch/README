@@ -1,0 +1,32 @@
+plusQL -> pQDigitStopWatch
+
+pQDigitStopWatch is a simple widget that use QTimer to simulate a digit stop
+watch. It recieve a QString as format string to show how much time has gone.
+Here is an example:
+	"<font size=6 color=\"red\"><b>%h%:%m%:%s%</b></font>"
+This string will show a 6-size and red number stop watch. For the format 
+string, "%h%" means that plusQL should show the hour's digits here. "%m%" 
+stands for the minute's; "%s%" is for the seconds and "%ms%" is for the 
+milliseconds. The interval is in milliseconds.
+
+	public slots:
+		void reset();
+		void start(int );
+		void stop();
+		void setFormat(QString formatstring);
+	signals:
+		void timeout();
+		void alarm();
+	public:
+		pQDigitStopWatch(QWidget *parent=0);
+		bool isActive();
+		int interval();
+		void setInterval(int );
+		QTime currentTime();
+		void alarmAtTime(QTime);
+	
+* You can use alarmAtTime() to tell pQDigitStopWatch a time and then it will
+emit signal alarm() to tell the program that it's time to do somgthing.
+* Each time the numbers of stop watch changed, signal timeout() will be 
+emitted.
+

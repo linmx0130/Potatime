@@ -22,7 +22,10 @@ void creatLock()
 	int lock_desc=LinuxApi::open(filepath.c_str(),O_RDWR|O_CREAT|O_EXCL,0444);
 	if (lock_desc==-1)
 	{
-			LinuxApi::exit(1);
+		filepath=getHomePath();
+		filepath+="/.potawake";
+		LinuxApi::close(LinuxApi::open(filepath.c_str(),O_CREAT,0666));
+		LinuxApi::exit(1);
 	}
 }
 
@@ -36,4 +39,16 @@ void Quit(int exitnum)
 {
 	LinuxApi::exit(exitnum);
 }
+bool wakeFileExist()
+{
+	std::string wakefile=getHomePath();
+	wakefile+="/.potawake";
+	if (!LinuxApi::access(wakefile.c_str(),0))
+	{
+		LinuxApi::unlink(wakefile.c_str());
+		return 1;
+	}
+	return 0;
+}
+
 }

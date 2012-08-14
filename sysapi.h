@@ -7,5 +7,7 @@ std::string getHomePath();
 void creatLock();
 void deleteLock();
 void Quit(int);
+void wake();
+bool wakeFileExist();
 }
 #endif

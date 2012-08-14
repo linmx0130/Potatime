@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QListWidget>
+#include <QCloseEvent>
 #include <vector>
 #include <string>
 #include "pQDigitStopWatch.h"
@@ -22,6 +23,7 @@ private slots:
 	void Quit_Click();
 	void ControlButton_Click();
 	void TasklistView_Click(int);
+	void Wakefile_Scan();
 signals:
 
 private:
@@ -34,6 +36,8 @@ private:
 	void loadFile();
 	void saveFile();
 	int chosen;
+protected:
+	void closeEvent(QCloseEvent *event);
 public:
 	potatime(QWidget *parent=0);
 

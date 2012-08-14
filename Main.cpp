@@ -3,7 +3,7 @@
 #include "sysapi.h"
 #include <fstream>
 #include <iostream>
-int __status=-1;
+int __status=0;
 std::vector<TaskNode> tasklist;
 void potatime::Quit_Click()
 {
@@ -34,6 +34,7 @@ potatime::potatime(QWidget *parent)
 	connect(Quit,SIGNAL(clicked()),this,SLOT(Quit_Click()));
 	connect(ControlButton,SIGNAL(clicked()),this,SLOT(ControlButton_Click()));
 	connect(TastlistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
+	connect(StopWatch,SIGNAL(timeout()),this,SLOT(Wakefile_Scan()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -43,14 +44,27 @@ void potatime::ControlButton_Click()
 {
 	if (__status==-1)
 	{
-
+		return;
 	}
 	if (__status==0)
 	{
+		this->TastlistView->setEnabled(0);
 		this->StopWatch->start(1000);
 		__status=1;
+		this->ControlButton->setText("Give up");
+		return ;
 	}
-	
+	if (__status==1)
+	{
+		__status=0;
+		this->ControlButton->setText("Start");
+		this->StopWatch->stop();
+		this->StopWatch->reset();
+		this->nowTask->setText("You have give up the task!");
+		tasklist[this->chosen].fail++;
+		this->TastlistView->setEnabled(1);
+		return ;
+	}
 }
 void potatime::loadFile()
 {
@@ -94,6 +108,25 @@ void potatime::TasklistView_Click(int choose)
 	{
 		nowTask->setText("No task is chosen.");
 		__status=-1;
+	}
+}
+void potatime::closeEvent(QCloseEvent *event)
+{
+	if (__status==1)
+	{
+		event->ignore();
+		this->hide();
+	}
+	else
+	{
+		Quit_Click();
+	}
+}
+void potatime::Wakefile_Scan()
+{
+	if (Sysapi::wakeFileExist())
+	{
+		this->show();
 	}
 }
 int main(int argc,char *argv[])

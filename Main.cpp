@@ -57,7 +57,7 @@ void potatime::ControlButton_Click()
 		__status=POTA_WORK;
 		this->ControlButton->setText("Give up");
 		this->nowTask->setText("Working on the task!");
-		QTime _25min(0,0,5);
+		QTime _25min(0,25,0);
 		this->StopWatch->alarmAtTime(_25min);
 		connect(StopWatch,SIGNAL(alarm()),this,SLOT(Alarm_Slot()));
 		return ;
@@ -89,6 +89,7 @@ void potatime::loadFile()
 		TaskNode willi;
 		willi.name=buf;
 		fin>>willi.fail;
+		fin>>willi.success;
 		tasklist.push_back(willi);
 		TastlistView->addItem(willi.name.c_str());
 	}
@@ -101,7 +102,9 @@ void potatime::saveFile()
 	std::ofstream fout(filename.c_str());
 	for (size_t i=0;i!=tasklist.size();++i)
 	{
-		fout<<tasklist[i].name<<std::endl<<tasklist[i].fail<<std::endl;
+		fout<<tasklist[i].name<<std::endl
+			<<tasklist[i].fail<<std::endl
+			<<tasklist[i].success<<std::endl;
 	}
 	fout.close();
 }
@@ -144,8 +147,10 @@ void potatime::Wakefile_Scan()
 void potatime::startRest()
 {
 	rested++;
+	QApplication::beep();
 	this->StopWatch->stop();
 	this->StopWatch->reset();
+	tasklist[this->chosen].success++;
 	__status=POTA_REST;
 	this->show();
 	this->ControlButton->setText("Stop Rest");
@@ -159,8 +164,8 @@ void potatime::startRest()
 	else 
 	{
 		nowTask->setText("You will have a short rest!(5min)");
-		QTime _15min(0,0,2);
-		this->StopWatch->alarmAtTime(_15min);
+		QTime _5min(0,5);
+		this->StopWatch->alarmAtTime(_5min);
 	}
 	this->StopWatch->start(1000);
 }

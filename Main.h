@@ -13,7 +13,7 @@
 struct TaskNode
 {
 	std::string name;
-	int fail;
+	int fail,success;
 };
 extern std::vector<TaskNode> tasklist;
 class potatime:public QWidget

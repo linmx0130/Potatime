@@ -14,6 +14,7 @@ void potatime::Quit_Click()
 potatime::potatime(QWidget *parent)
 		:QWidget(parent)
 {
+	chosen=-1;
 	mainlayout=new QHBoxLayout;
 	rightlayout=new QVBoxLayout;
 	leftlayout=new QVBoxLayout;
@@ -21,7 +22,7 @@ potatime::potatime(QWidget *parent)
 	ControlButton=new QPushButton("Start");
 	Quit=new QPushButton("Quit");
 	TastlistView=new QListWidget;
-	nowTask=new QLabel("No task is be chosen");
+	nowTask=new QLabel("No task is chosen.");
 
 	StopWatch->setFormat("<font size=7 color=\"red\">%m%:%s%</font>");
 	StopWatch->reset();
@@ -32,6 +33,7 @@ potatime::potatime(QWidget *parent)
 	leftlayout->addWidget(nowTask);
 	connect(Quit,SIGNAL(clicked()),this,SLOT(Quit_Click()));
 	connect(ControlButton,SIGNAL(clicked()),this,SLOT(ControlButton_Click()));
+	connect(TastlistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -76,6 +78,23 @@ void potatime::saveFile()
 		fout<<tasklist[i].name<<std::endl<<tasklist[i].fail<<std::endl;
 	}
 	fout.close();
+}
+void potatime::TasklistView_Click(int choose)
+{
+	this->chosen=choose;
+	if (choose!=-1)
+	{
+		std::string newTasktip("\"");
+		newTasktip+=tasklist[choose].name;
+		newTasktip+="\" is chosen!";
+		nowTask->setText(newTasktip.c_str());
+		__status=0;
+	}
+	else 
+	{
+		nowTask->setText("No task is chosen.");
+		__status=-1;
+	}
 }
 int main(int argc,char *argv[])
 {

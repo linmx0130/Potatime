@@ -21,6 +21,7 @@ Q_OBJECT
 private slots:
 	void Quit_Click();
 	void ControlButton_Click();
+	void TasklistView_Click(int);
 signals:
 
 private:
@@ -32,6 +33,7 @@ private:
 	QLabel *nowTask;
 	void loadFile();
 	void saveFile();
+	int chosen;
 public:
 	potatime(QWidget *parent=0);
 

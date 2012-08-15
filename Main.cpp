@@ -3,6 +3,7 @@
 #include "sysapi.h"
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 int __status=0;
 #define POTA_WAIT 0
 #define POTA_WORK 1
@@ -15,6 +16,18 @@ void potatime::Quit_Click()
 	Sysapi::deleteLock();
 	Sysapi::Quit(0);
 }
+std::string int2string(int d)
+{
+	std::string ret;
+	while (d)
+	{
+		char c=(d%10+'0');
+		ret+=c;
+		d/=10;
+	}
+	std::reverse(ret.begin(),ret.end());
+	return ret;
+}
 potatime::potatime(QWidget *parent)
 		:QWidget(parent)
 {
@@ -25,19 +38,33 @@ potatime::potatime(QWidget *parent)
 	StopWatch=new pQDigitStopWatch;
 	ControlButton=new QPushButton("Start");
 	Quit=new QPushButton("Quit");
-	TastlistView=new QListWidget;
+	TasklistView=new QListWidget;
 	nowTask=new QLabel("No task is chosen.");
+	listMenu=new QMenu();
+	addTaskAction=new QAction("Add task",0);
+	editTaskAction=new QAction("Edit task",0);
+	TaskSuccessTip=new QAction("",0);
+	TaskFailTip=new QAction("",0);
+	listMenu->addAction(addTaskAction);
+	listMenu->addAction(editTaskAction);
+	listMenu->addAction(TaskSuccessTip);
+	listMenu->addAction(TaskFailTip);
 
+	TasklistView->setContextMenuPolicy(Qt::CustomContextMenu);
+	TaskSuccessTip->setEnabled(0);
+	TaskFailTip->setEnabled(0);
+	connect(TasklistView,SIGNAL(customContextMenuRequested(const QPoint&)),
+			this,SLOT(TasklistView_ContextMenu(const QPoint&)));
 	StopWatch->setFormat("<font size=7 color=\"red\">%m%:%s%</font>");
 	StopWatch->reset();
 	rightlayout->addWidget(StopWatch);
 	rightlayout->addWidget(ControlButton);
 	rightlayout->addWidget(Quit);
-	leftlayout->addWidget(TastlistView);
+	leftlayout->addWidget(TasklistView);
 	leftlayout->addWidget(nowTask);
 	connect(Quit,SIGNAL(clicked()),this,SLOT(Quit_Click()));
 	connect(ControlButton,SIGNAL(clicked()),this,SLOT(ControlButton_Click()));
-	connect(TastlistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
+	connect(TasklistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
 	connect(StopWatch,SIGNAL(timeout()),this,SLOT(Wakefile_Scan()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
@@ -52,7 +79,7 @@ void potatime::ControlButton_Click()
 	}
 	if (__status==POTA_WAIT)
 	{
-		this->TastlistView->setEnabled(0);
+		this->TasklistView->setEnabled(0);
 		this->StopWatch->start(1000);
 		__status=POTA_WORK;
 		this->ControlButton->setText("Give up");
@@ -70,7 +97,7 @@ void potatime::ControlButton_Click()
 		this->StopWatch->reset();
 		this->nowTask->setText("You have give up the task!");
 		tasklist[this->chosen].fail++;
-		this->TastlistView->setEnabled(1);
+		this->TasklistView->setEnabled(1);
 		return ;
 	}
 	if (__status==POTA_REST)
@@ -91,7 +118,7 @@ void potatime::loadFile()
 		fin>>willi.fail;
 		fin>>willi.success;
 		tasklist.push_back(willi);
-		TastlistView->addItem(willi.name.c_str());
+		TasklistView->addItem(willi.name.c_str());
 	}
 	fin.close();
 }
@@ -177,7 +204,7 @@ void potatime::endRest()
 	this->ControlButton->setText("Start");
 	__status=POTA_WAIT;
 	nowTask->setText("Rest is end! Please choose a task.");
-	this->TastlistView->setEnabled(1);
+	this->TasklistView->setEnabled(1);
 }
 void potatime::Alarm_Slot()
 {
@@ -205,4 +232,27 @@ int main(int argc,char *argv[])
 	MainWin->show();
 	app.setQuitOnLastWindowClosed(0);
 	return app.exec();
+}
+void potatime::TasklistView_ContextMenu(const QPoint& pos)
+{
+	if (TasklistView->itemAt(pos)!=NULL)
+	{
+		editTaskAction->setEnabled(1);
+		TaskSuccessTip->setVisible(1);
+		TaskFailTip->setVisible(1);
+		std::string buf;
+		buf="Success:";
+		buf+=int2string(tasklist[chosen].success);
+		TaskSuccessTip->setText(buf.c_str());
+		buf="Fail:";
+		buf+=int2string(tasklist[chosen].fail);
+		TaskFailTip->setText(buf.c_str());
+	}
+	else 
+	{
+		editTaskAction->setEnabled(0);
+		TaskSuccessTip->setVisible(0);
+		TaskFailTip->setVisible(0);
+	}
+	this->listMenu->exec(QCursor::pos());
 }

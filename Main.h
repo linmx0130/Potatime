@@ -7,8 +7,11 @@
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QCloseEvent>
+#include <QMenu>
+#include <QAction>
 #include <vector>
 #include <string>
+#include <QPoint>
 #include "pQDigitStopWatch.h"
 struct TaskNode
 {
@@ -25,6 +28,7 @@ private slots:
 	void TasklistView_Click(int);
 	void Wakefile_Scan();
 	void Alarm_Slot();
+	void TasklistView_ContextMenu(const QPoint &pos);
 signals:
 
 private:
@@ -32,8 +36,10 @@ private:
 	QVBoxLayout *rightlayout,*leftlayout;
 	pQDigitStopWatch *StopWatch;
 	QPushButton *ControlButton,*Quit;
-	QListWidget *TastlistView;
+	QListWidget *TasklistView;
 	QLabel *nowTask;
+	QMenu *listMenu;
+	QAction *addTaskAction,*editTaskAction,*TaskSuccessTip,*TaskFailTip;
 	void loadFile();
 	void saveFile();
 	void startRest();

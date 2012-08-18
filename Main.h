@@ -29,6 +29,7 @@ private slots:
 	void Wakefile_Scan();
 	void Alarm_Slot();
 	void TasklistView_ContextMenu(const QPoint &pos);
+	void addTaskAction_Click();
 signals:
 
 private:

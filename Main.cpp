@@ -18,6 +18,10 @@ void potatime::Quit_Click()
 }
 std::string int2string(int d)
 {
+	if (d==0)
+	{
+		return "0";
+	}
 	std::string ret;
 	while (d)
 	{
@@ -66,6 +70,7 @@ potatime::potatime(QWidget *parent)
 	connect(ControlButton,SIGNAL(clicked()),this,SLOT(ControlButton_Click()));
 	connect(TasklistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
 	connect(StopWatch,SIGNAL(timeout()),this,SLOT(Wakefile_Scan()));
+	connect(addTaskAction,SIGNAL(triggered()),this,SLOT(addTaskAction_Click()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -111,6 +116,13 @@ void potatime::loadFile()
 	filename+="/.potalist";
 	std::ifstream fin(filename.c_str());
 	std::string buf;
+	if (!fin)
+	{
+		fin.close();
+		std::ofstream fout(filename.c_str());
+		fout.close();
+		fin.open(filename.c_str());
+	}
 	while (fin >>buf)
 	{
 		TaskNode willi;
@@ -255,4 +267,21 @@ void potatime::TasklistView_ContextMenu(const QPoint& pos)
 		TaskFailTip->setVisible(0);
 	}
 	this->listMenu->exec(QCursor::pos());
+}
+void potatime::addTaskAction_Click()
+{
+	bool trueadd;
+	QString taskname;
+	taskname=QInputDialog::getText(this,"Add Task",
+					"Please input the name of the task",
+					QLineEdit::Normal,
+					"",&trueadd);
+	if (trueadd&&!taskname.isEmpty())
+	{
+		TasklistView->addItem(taskname);
+		TaskNode newn;
+		newn.name=taskname.toStdString();
+		newn.fail=newn.success=0;
+		tasklist.push_back(newn);
+	}
 }

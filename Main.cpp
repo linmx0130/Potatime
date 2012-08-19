@@ -41,6 +41,8 @@ potatime::potatime(QWidget *parent)
 	leftlayout=new QVBoxLayout;
 	StopWatch=new pQDigitStopWatch;
 	ControlButton=new QPushButton("Start");
+	AnalysisButton=new QPushButton("Analysis");
+	HelpButton=new QPushButton("Help");
 	Quit=new QPushButton("Quit");
 	TasklistView=new QListWidget;
 	nowTask=new QLabel("No task is chosen.");
@@ -66,6 +68,8 @@ potatime::potatime(QWidget *parent)
 	StopWatch->reset();
 	rightlayout->addWidget(StopWatch);
 	rightlayout->addWidget(ControlButton);
+	rightlayout->addWidget(AnalysisButton);
+	rightlayout->addWidget(HelpButton);
 	rightlayout->addWidget(Quit);
 	leftlayout->addWidget(TasklistView);
 	leftlayout->addWidget(nowTask);
@@ -77,6 +81,7 @@ potatime::potatime(QWidget *parent)
 	connect(addTaskAction,SIGNAL(triggered()),this,SLOT(addTaskAction_Click()));
 	connect(editTaskAction,SIGNAL(triggered()),this,SLOT(editTaskAction_Click()));
 	connect(removeTaskAction,SIGNAL(triggered()),this,SLOT(removeTaskAction_Click()));
+	connect(AnalysisButton,SIGNAL(clicked()),this,SLOT(AnalysisButton_Click()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -88,7 +93,7 @@ void potatime::ControlButton_Click()
 	{
 		return;
 	}
-	if (__status==POTA_WAIT)
+	if (__status==POTA_WAIT&&chosen>=0)
 	{
 		this->TasklistView->setEnabled(0);
 		this->StopWatch->start(1000);
@@ -324,4 +329,26 @@ void potatime::removeTaskAction_Click()
 		delete willd;
 		this->TasklistView_Click(TasklistView->currentRow());
 	}
+}
+void potatime::AnalysisButton_Click()
+{
+	int Tottask=0,SuccessTask=0;
+	for (size_t i=0;i!=tasklist.size();++i)
+	{
+		Tottask+=tasklist[i].success+tasklist[i].fail;
+		SuccessTask+=tasklist[i].success;
+	}
+	double rate=0;
+	if (!Tottask) rate=(double)SuccessTask/Tottask*100;
+	char buf[100];
+	memset(buf,0,sizeof(buf));
+	sprintf(buf,"%.2lf%",rate);
+	std::string msg;
+	msg+="Total Task:";
+	msg+=int2string(Tottask);
+	msg+="\nFinished Task:";
+	msg+=int2string(SuccessTask);
+	msg+="\nFinished Rate:";
+	msg+=buf;
+	QMessageBox::information(this,"Analysis",msg.c_str(),QMessageBox::Yes);
 }

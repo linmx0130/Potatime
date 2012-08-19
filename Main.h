@@ -32,13 +32,14 @@ private slots:
 	void addTaskAction_Click();
 	void editTaskAction_Click();
 	void removeTaskAction_Click();
+	void AnalysisButton_Click();
 signals:
 
 private:
 	QHBoxLayout *mainlayout;
 	QVBoxLayout *rightlayout,*leftlayout;
 	pQDigitStopWatch *StopWatch;
-	QPushButton *ControlButton,*Quit;
+	QPushButton *ControlButton,*Quit,*HelpButton,*AnalysisButton;
 	QListWidget *TasklistView;
 	QLabel *nowTask;
 	QMenu *listMenu;

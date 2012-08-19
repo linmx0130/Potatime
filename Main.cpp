@@ -47,10 +47,13 @@ potatime::potatime(QWidget *parent)
 	listMenu=new QMenu();
 	addTaskAction=new QAction("Add task",0);
 	editTaskAction=new QAction("Edit task",0);
+	removeTaskAction=new QAction("Remove task",0);
+
 	TaskSuccessTip=new QAction("",0);
 	TaskFailTip=new QAction("",0);
 	listMenu->addAction(addTaskAction);
 	listMenu->addAction(editTaskAction);
+	listMenu->addAction(removeTaskAction);
 	listMenu->addAction(TaskSuccessTip);
 	listMenu->addAction(TaskFailTip);
 
@@ -66,11 +69,14 @@ potatime::potatime(QWidget *parent)
 	rightlayout->addWidget(Quit);
 	leftlayout->addWidget(TasklistView);
 	leftlayout->addWidget(nowTask);
+	
 	connect(Quit,SIGNAL(clicked()),this,SLOT(Quit_Click()));
 	connect(ControlButton,SIGNAL(clicked()),this,SLOT(ControlButton_Click()));
 	connect(TasklistView,SIGNAL(currentRowChanged(int)),this,SLOT(TasklistView_Click(int)));
 	connect(StopWatch,SIGNAL(timeout()),this,SLOT(Wakefile_Scan()));
 	connect(addTaskAction,SIGNAL(triggered()),this,SLOT(addTaskAction_Click()));
+	connect(editTaskAction,SIGNAL(triggered()),this,SLOT(editTaskAction_Click()));
+	connect(removeTaskAction,SIGNAL(triggered()),this,SLOT(removeTaskAction_Click()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -250,6 +256,7 @@ void potatime::TasklistView_ContextMenu(const QPoint& pos)
 	if (TasklistView->itemAt(pos)!=NULL)
 	{
 		editTaskAction->setEnabled(1);
+		removeTaskAction->setEnabled(1);
 		TaskSuccessTip->setVisible(1);
 		TaskFailTip->setVisible(1);
 		std::string buf;
@@ -263,6 +270,7 @@ void potatime::TasklistView_ContextMenu(const QPoint& pos)
 	else 
 	{
 		editTaskAction->setEnabled(0);
+		removeTaskAction->setEnabled(0);
 		TaskSuccessTip->setVisible(0);
 		TaskFailTip->setVisible(0);
 	}
@@ -283,5 +291,37 @@ void potatime::addTaskAction_Click()
 		newn.name=taskname.toStdString();
 		newn.fail=newn.success=0;
 		tasklist.push_back(newn);
+	}
+}
+void potatime::editTaskAction_Click()
+{
+	bool truechange;
+	QString taskname;
+	taskname=QInputDialog::getText(this,"Edit Task",
+					"Please input the new name of the task",
+					QLineEdit::Normal,
+					TasklistView->item(this->chosen)->text(),
+					&truechange);
+	if (truechange&&!taskname.isEmpty())
+	{
+		TasklistView->item(this->chosen)->setText(taskname);
+		tasklist[this->chosen].name=taskname.toStdString();
+	}
+
+}
+void potatime::removeTaskAction_Click()
+{
+	int ans=QMessageBox::warning(this,"Delete task",
+					"This action will changed the result of the analyze.\n"
+					"Do you really want to delete it?",
+					QMessageBox::Yes|QMessageBox::Cancel);
+	if (ans==QMessageBox::Yes)
+	{
+		std::vector<TaskNode>::iterator iter=tasklist.begin()+this->chosen;
+		tasklist.erase(iter);
+		QListWidgetItem* willd=TasklistView->item(this->chosen);
+		TasklistView->removeItemWidget(willd);
+		delete willd;
+		this->TasklistView_Click(TasklistView->currentRow());
 	}
 }

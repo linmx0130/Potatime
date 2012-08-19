@@ -30,6 +30,8 @@ private slots:
 	void Alarm_Slot();
 	void TasklistView_ContextMenu(const QPoint &pos);
 	void addTaskAction_Click();
+	void editTaskAction_Click();
+	void removeTaskAction_Click();
 signals:
 
 private:
@@ -40,7 +42,7 @@ private:
 	QListWidget *TasklistView;
 	QLabel *nowTask;
 	QMenu *listMenu;
-	QAction *addTaskAction,*editTaskAction,*TaskSuccessTip,*TaskFailTip;
+	QAction *addTaskAction,*editTaskAction,*TaskSuccessTip,*TaskFailTip,*removeTaskAction;
 	void loadFile();
 	void saveFile();
 	void startRest();

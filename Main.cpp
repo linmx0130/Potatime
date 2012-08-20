@@ -82,6 +82,7 @@ potatime::potatime(QWidget *parent)
 	connect(editTaskAction,SIGNAL(triggered()),this,SLOT(editTaskAction_Click()));
 	connect(removeTaskAction,SIGNAL(triggered()),this,SLOT(removeTaskAction_Click()));
 	connect(AnalysisButton,SIGNAL(clicked()),this,SLOT(AnalysisButton_Click()));
+	connect(HelpButton,SIGNAL(clicked()),this,SLOT(HelpButton_Click()));
 	mainlayout->addLayout(leftlayout);
 	mainlayout->addLayout(rightlayout);
 	setLayout(mainlayout);
@@ -342,7 +343,7 @@ void potatime::AnalysisButton_Click()
 	if (!Tottask) rate=(double)SuccessTask/Tottask*100;
 	char buf[100];
 	memset(buf,0,sizeof(buf));
-	sprintf(buf,"%.2lf%",rate);
+	sprintf(buf,"%.2lf%%",rate);
 	std::string msg;
 	msg+="Total Task:";
 	msg+=int2string(Tottask);
@@ -351,4 +352,23 @@ void potatime::AnalysisButton_Click()
 	msg+="\nFinished Rate:";
 	msg+=buf;
 	QMessageBox::information(this,"Analysis",msg.c_str(),QMessageBox::Yes);
+}
+void potatime::HelpButton_Click()
+{
+	QMessageBox::about(this,"About Potatime",
+					"<h2>Potatime</h2>"
+					"<p>Copyright &copy;2012 Michael Lin (linmx0130@gmai.com)</p>"
+					"<p>Potatime is a simple Pomodoro timer.<br/>"
+					"If you want to get more information, please read the manual.</p>"
+"<p>This program is free software: you can redistribute it and/or modify "
+"it under the terms of the GNU General Public License as published by "
+"the Free Software Foundation, either version 3 of the License, or "
+"(at your option) any later version.</p>"
+"<p>This program is distributed in the hope that it will be useful, "
+"but WITHOUT ANY WARRANTY; without even the implied warranty of "
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the "
+"GNU General Public License for more details.</p>" 
+"<p>You should have received a copy of the GNU General Public License "
+"along with this program.  If not, see (http://www.gnu.org/licenses/).</p>"
+);
 }

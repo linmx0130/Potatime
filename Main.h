@@ -33,6 +33,7 @@ private slots:
 	void editTaskAction_Click();
 	void removeTaskAction_Click();
 	void AnalysisButton_Click();
+	void HelpButton_Click();
 signals:
 
 private:
